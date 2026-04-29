@@ -230,34 +230,52 @@
 ---
 
 ### 6.6 `TrainingSession`
-**الدور:** تمثيل الحصة الصباحية أو المسائية أو أي حصة أخرى.
+**الدور:** تمثيل الحصة التدريبية للمجموعة (حسب فئة الاختصاص).
 
 #### الحقول الأساسية
 - `TrainingSessionId`
 - `DailyProgramDayId`
+- `SportSpecialtyMetricId` (الارتباط بفئة الاختصاص)
+- `MainCoachId` (المدرب المشرف)
 - `SessionType` (`Morning`, `Evening`, `Extra`, `Recovery`)
 - `StartTime`
 - `EndTime`
 - `Location`
-- `SessionGoal`
-- `TechnicalContent`
-- `PhysicalContent`
-- `LoadTarget`
-- `IsMandatory`
+- `GeneralSessionGoal`
+- `GeneralTechnicalContent`
+- `GeneralPhysicalContent`
+- `BaselineLoadTarget` (الحمل الأولي المستهدف للمجموعة)
 - `Notes`
 
 #### ملاحظات
-- هذا الكيان يترجم النموذج الورقي إلى كيان قابل للتنفيذ.
-- يمكن أن يكون لكل يوم حصة واحدة أو حصتان أو أكثر بحسب السياسة الفنية.
+- يمثل الحدث الزماني والمكاني الجماعي لفئة الاختصاص.
+- يُنشأ مرة واحدة للمجموعة، ولا يعاد تكراره لكل رياضي.
 
 ---
 
-### 6.7 `TrainingExecutionResult`
-**الدور:** تسجيل ما حدث فعليًا في الحصة + تقييم الرياضي للحمل.
+### 6.7 `AthleteSessionPrescription`
+**الدور:** الوصفة الفردية (التكليف) لكل رياضي داخل الحصة الجماعية.
+
+#### الحقول الأساسية
+- `AthleteSessionPrescriptionId`
+- `TrainingSessionId`
+- `AthleteId`
+- `IsMandatory`
+- `IndividualAdaptationNotes` (ملاحظات لتخصيص الحصة: مثلا جريح، أو برنامج خاص)
+- `IndividualLoadTarget` (الحمل المخصص للرياضي، قد يختلف عن `BaselineLoadTarget`)
+
+#### ملاحظات
+- جدول وسيط يربط الحصة بالرياضيين المشاركين.
+- يتيح تخصيص الجهد والمحتوى استجابة للفروق الفردية بدون تغيير خطة باقي الفريق.
+
+---
+
+### 6.8 `TrainingExecutionResult`
+**الدور:** تسجيل النتيجة الفعلية لتكليف الرياضي وتقييمه للحمل.
 
 #### الحقول الأساسية
 - `TrainingExecutionResultId`
-- `TrainingSessionId`
+- `AthleteSessionPrescriptionId` (استبدل الارتباط المباشر بالحصة والرياضي هنا)
 - `ExecutedAtUtc`
 - `ExecutedByUserId`
 - `WasExecuted`
@@ -276,15 +294,13 @@
 - **`CalculatedDailyLoad`** — الحمل اليومي المحسوب بناء على التقييم
 
 #### ملاحظات
-- **الحقول الجديدة مهمة جدًا:** تقييم الرياضي هو الأساس لحساب الأحمال الفعلية.
-- **AthleteLoadRating** يُقدم من الرياضي بعد الحصة مباشرة (سؤال بسيط: "كم تقيم حمل هذه الحصة من 0-10؟").
-- يتم استخدام هذا التقييم مع عوامل أخرى (فنية، طبية، علمية) لحساب الحمل الفعلي.
-- هذا الكيان يربط التخطيط بالواقع والإحصائيات.
-- يتيح حساب مؤشرات الالتزام والانحراف والأحمال الفعلية.
+- هذا الكيان يربط التخطيط بالواقع العملي.
+- **AthleteLoadRating** يُقدم من الرياضي بعد كل حصة وينتج عنه الحسابات.
+- يتيح حساب الحمل الفردي بدقة بناءً على مخرجات التكليف (Prescription).
 
 ---
 
-### 6.8 `PlanningDecision`
+### 6.9 `PlanningDecision`
 **الدور:** توثيق القرار الفني الذي يسبب تحيينًا في البرنامج.
 
 #### الحقول الأساسية
@@ -304,7 +320,7 @@
 
 ---
 
-### 6.9 `ScientificTestResult`
+### 6.10 `ScientificTestResult`
 **الدور:** تخزين نتائج الاختبارات العلمية المرتبطة بالبرمجة.
 
 #### الحقول الأساسية
@@ -325,7 +341,7 @@
 
 ---
 
-### 6.10 `MedicalObservation`
+### 6.11 `MedicalObservation`
 **الدور:** الملاحظات الطبية المؤثرة على البرمجة.
 
 #### الحقول الأساسية
@@ -346,7 +362,7 @@
 
 ---
 
-### 6.11 `PlanningAttachment`
+### 6.12 `PlanningAttachment`
 **الدور:** ملفات ومستندات التخطيط.
 
 #### الحقول الأساسية
@@ -364,7 +380,7 @@
 
 ---
 
-### 6.12 `DailyLoadStatistic`
+### 6.13 `DailyLoadStatistic`
 **الدور:** إحصائيات الحمل اليومي للرياضي (محسوبة من تقييمات الحصص).
 
 #### الحقول الأساسية
@@ -385,7 +401,7 @@
 
 ---
 
-### 6.13 `WeeklyLoadStatistic`
+### 6.14 `WeeklyLoadStatistic`
 **الدور:** إحصائيات الحمل الأسبوعي للرياضي.
 
 #### الحقول الأساسية
@@ -408,7 +424,7 @@
 
 ---
 
-### 6.14 `MonthlyLoadStatistic`
+### 6.15 `MonthlyLoadStatistic`
 **الدور:** إحصائيات الحمل الشهري للرياضي (تجميع أسبوعي).
 
 #### الحقول الأساسية
@@ -446,8 +462,9 @@
 - `AnnualPlanningReference` 1 → N `AnnualPlanningBlock`
 - `MonthlyProgram` 1 → N `WeeklyProgram`
 - `WeeklyProgram` 1 → N `DailyProgramDay`
-- `DailyProgramDay` 1 → N `TrainingSession`
-- `TrainingSession` 1 → 1 `TrainingExecutionResult` أو 1 → N حسب الحاجة
+- `DailyProgramDay` 1 → N `TrainingSession` (الحصة الجماعية)
+- `TrainingSession` 1 → N `AthleteSessionPrescription` (التكليف الفردي)
+- `AthleteSessionPrescription` 1 → 1 أو 1 → N `TrainingExecutionResult`
 
 ### علاقة النتائج والإحصائيات
 - `Athlete` 1 → N `ScientificTestResult`
@@ -592,9 +609,14 @@ DeviationPercentage = ((ActualLoad - PlannedLoad) / PlannedLoad) × 100
 
 #### `TrainingSessionConfiguration`
 - فهرس على `DailyProgramDayId` و`SessionType`
+- يرتبط بمفتاح خارجي بـ `SportSpecialtyMetric` و `MainCoach`
+
+#### `AthleteSessionPrescriptionConfiguration`
+- فهرس فريد على `TrainingSessionId` و `AthleteId` معًا.
+- علاقات بـ `TrainingSession` (Cascade) و `Athlete` (Restrict).
 
 #### `TrainingExecutionResultConfiguration`
-- فهرس على `TrainingSessionId`
+- فهرس على `AthleteSessionPrescriptionId`
 - فهرس على `WasExecuted`
 
 ### 11.3 Delete Behaviors
@@ -621,7 +643,8 @@ DeviationPercentage = ((ActualLoad - PlannedLoad) / PlannedLoad) × 100
 - `MonthlyProgram`
 - `WeeklyProgram`
 - `DailyProgramDay`
-- `TrainingSession`
+- `TrainingSession` (كمجموعة)
+- `AthleteSessionPrescription` (كتكليف فردي)
 - `TrainingExecutionResult`
 - `PlanningDecision`
 - `ScientificTestResult`
